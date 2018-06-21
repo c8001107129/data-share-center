@@ -1,0 +1,62 @@
+#配置日志
+#logging:
+#    #配置日志文件路径
+#    path: ../logs
+#    level:
+#        com.gw: debug
+#    pattern:
+#      file: "%d{yyyy-MM-dd HH:mm:ss.SSS} -%5p ${PID:-} %logger{36} %line: %m%n"
+#      #console: "%d{yyyy-MM-dd HH:mm:ss.SSS} -%5p ${PID:-} %logger{36} %line: %m%n"
+logback:
+  logdir: ../logs
+  appname: data-share-center
+
+#激活那一个环境配置文件
+#公共配置
+spring:
+  profiles:
+    active: uat
+#服务配置
+#server:
+#  context-path: /api
+#  port: 8088
+#  tomcat:
+#    uri-encoding: UTF-8 #URI编码
+#    max-threads: 200 # 最大线程数、默认200
+server:
+  #context-path: /api 1.5.9版本配置
+  servlet:
+    context-path: /api
+    session:
+      timeout: 1200 #设置容器的session失效时间，单位秒
+  port: 8088
+  undertow:
+    io-threads: 6 #为worker创建的I / O线程数。
+    worker-threads: 200 #工作线程数,默认IO*8
+    buffer-size: 1024 #每个缓冲区的大小（以字节为单位）
+    buffers-per-region: 1024 #每个区域的缓冲区数。
+    direct-buffers: true #在Java堆外分配缓冲区。
+
+---
+#mongodb配置多数据参考：https://github.com/a123demi/spring-boot-integration/tree/master/springboot-integ-mongo-mdsource
+spring:
+  profiles: local
+  data:
+    mongodb:
+      primary:
+        uri: localhost:27017
+        database: gts2_business_data
+      secondary:
+        uri: localhost:27017
+        database: permission_config
+---
+spring:
+  profiles: uat
+  data:
+    mongodb:
+      primary:
+        uri: 192.168.35.44:47017
+        database: gts2_business_data
+      secondary:
+        uri: 192.168.35.44:47017
+        database: permission_config
