@@ -115,13 +115,14 @@ public class Gts2Controller {
                     }
                     //step4 正式查询
                     List<Gts2> obj = null;
+                    int count = 0; //记录每次获取的总记录数
                     if(read_num.intValue() == 0){ //这里如果没有参数就走原来的方式
                         query.limit(limit);
                         logger.debug("query,{}",query.toString());
                         obj = mongoTemplate.find(query, Gts2.class,collectionName);
                         statement.setData(obj);
                         statement.setAll_num(obj.size());
-                        logger.info("time-consuming,{},count,{},user,{}",System.currentTimeMillis()-start_time,obj.size(),user);
+                        count = obj.size();
                     }else {
                         //获取session对象
                         HttpSession session = request.getSession();
@@ -146,10 +147,12 @@ public class Gts2Controller {
                                     session.setAttribute(user+collectionName+"_page_num", _page_num);
                                 }
                             }
-                            statement.setData(pageList.getPagedList(_page_num));
+                            List data = pageList.getPagedList(_page_num);
+                            statement.setData(data);
                             statement.setAll_num(_all_num);
                             statement.setPage_num(_page_num);
                             logger.debug("after：进入session查询,{},{}",_all_num,_page_num);
+                            count = data.size();
                         }else {
                             query.limit(limit);
                             logger.debug("query,{}",query.toString());
@@ -167,16 +170,17 @@ public class Gts2Controller {
                                 statement.setData(pageList.getPagedList(_page_num));
                                 statement.setAll_num(pageList.getAllCount());
                                 statement.setPage_num(_page_num);
+                                count = read_num;
                             }else{ //如果没有数据那就返回，空数组结果
                                 statement.setData(obj);
                                 statement.setAll_num(obj.size());
+                                count = obj.size();
                             }
                         }
-                        logger.info("time-consuming,{},count,{},user,{}",System.currentTimeMillis()-start_time,pageList==null?obj.size():pageList.getAllCount(),user);
                     }
                     statement.setStatus("OK");
                     //statement.setData(obj);
-                    //logger.info("time-consuming,{},count,{},user,{}",System.currentTimeMillis()-start_time,obj.size(),user);
+                    logger.info("time-consuming,{},count,{},user,{}",System.currentTimeMillis()-start_time,count,user);
                 }
 
             }else {
