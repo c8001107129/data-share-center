@@ -54,24 +54,29 @@ public class Gts2Controller {
 
     /**
      *
-     * @param user
-     * @param pwd
-     * @param collectionName
-     * @param condition
-     * @param limit
+     * @param user 用户账号
+     * @param pwd 用户密码
+     * @param collectionName 集合名称
+     * @param condition 查询条件
+     * @param limit 查询限制 记录数
+     * @param read_num 每次读取记录数
+     * @param clean_cache 清除缓存标记，默认参数不传或传0，不清除缓存，-1=操作前清除缓存
+     * @param request
      * @return
      */
     @RequestMapping("/find")
     ResponseStatement find(String user,
                            String pwd,
                            String collectionName,
-                           @RequestParam(defaultValue = "") String condition,
+                           @RequestParam(defaultValue = "{}") String condition,
                            @RequestParam(defaultValue = "100000") Integer limit,
-                           @RequestParam(defaultValue = "0")Integer read_num,
+                           @RequestParam(defaultValue = "0") Integer read_num,
+                           @RequestParam(defaultValue = "0") Integer clean_cache,
+                           @RequestParam(defaultValue = "0") Integer page_num,// todo 页码参数的功能暂时没有实现
                            HttpServletRequest request){
         long start_time = System.currentTimeMillis();
         condition = Utils.replaceBlank(condition);
-        logger.debug("parames,user:{},pwd:{},condition:{},collectionName:{},limit:{}",user,pwd,condition,collectionName,limit);
+        logger.debug("parames,user:{},pwd:{},condition:{},collectionName:{},limit:{},read_num:{},page_num:{}",user,pwd,condition,collectionName,limit,read_num,page_num);
         //返回信息实体
         ResponseStatement statement=new ResponseStatement();
         //step0 请求参数验证
@@ -98,7 +103,7 @@ public class Gts2Controller {
                     //指定返回字段
                     String fields="{'object':1,'_id':0,'meta.kafka.receivedTime':1}";
                     //step2 组合传入的条件信息
-                    Query query =  StringUtils.isEmpty(condition) ? new BasicQuery("{}",fields):new BasicQuery(condition,fields);
+                    Query query =  new BasicQuery(condition,fields);//StringUtils.isEmpty(condition) ? new BasicQuery("{}",fields):new BasicQuery(condition,fields);
                     logger.debug("1:{}",query.toString());
                     //过滤某些关键字：如 $regex
                     for (String key:keys){
@@ -127,6 +132,9 @@ public class Gts2Controller {
                     }else {
                         //获取session对象
                         HttpSession session = request.getSession();
+                        if(clean_cache.intValue() == -1){ //如果-1操作前清除缓存
+                            clean_cache(session, user, collectionName);
+                        }
                         logger.debug("maxInactiveInterval:{}",session.getMaxInactiveInterval());
                         Object s_user_collection = session.getAttribute(user+collectionName); //user+collectionName
                         ListPageUtil pageList = null;
@@ -141,9 +149,7 @@ public class Gts2Controller {
                                 _page_num+=1; //增加一页
                                 if(_page_num == pageList.getPageCount()){
                                     //删除session数据
-                                    session.removeAttribute(user+collectionName);
-                                    session.removeAttribute(user+collectionName+"_all_num");
-                                    session.removeAttribute(user+collectionName+"_page_num");
+                                    clean_cache(session, user, collectionName);
                                 }else { //记录当前已经是第几页数据了
                                     session.setAttribute(user+collectionName+"_page_num", _page_num);
                                 }
@@ -182,7 +188,7 @@ public class Gts2Controller {
                     }
                     statement.setStatus("OK");
                     //statement.setData(obj);
-                    logger.info("time-consuming,{},count,{},user,{}",System.currentTimeMillis()-start_time,count,user);
+                    logger.info("{},{},{},{}",System.currentTimeMillis()-start_time,count,user,collectionName);
                 }
 
             }else {
@@ -200,6 +206,18 @@ public class Gts2Controller {
             //e.printStackTrace();
         }
         return statement;
+    }
+
+    /**
+     * 清除缓存
+     * @param session
+     * @param user
+     * @param collectionName
+     */
+    private void clean_cache(HttpSession session, String user, String collectionName) {
+        session.removeAttribute(user+collectionName);
+        session.removeAttribute(user+collectionName+"_all_num");
+        session.removeAttribute(user+collectionName+"_page_num");
     }
 
     /**
