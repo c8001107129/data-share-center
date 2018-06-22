@@ -59,9 +59,9 @@ public class Gts2Controller {
      * @param collectionName 集合名称
      * @param condition 查询条件
      * @param limit 查询限制 记录数
-     * @param read_num 每次读取记录数
-     * @param clean_cache 清除缓存标记，默认参数不传或传0，不清除缓存，-1=操作前清除缓存
-     * @param request
+     * //@param read_num 每次读取记录数
+     * //@param clean_cache 清除缓存标记，默认参数不传或传0，不清除缓存，-1=操作前清除缓存
+     * //@param request
      * @return
      */
     @RequestMapping("/find")
@@ -69,14 +69,15 @@ public class Gts2Controller {
                            String pwd,
                            String collectionName,
                            @RequestParam(defaultValue = "{}") String condition,
-                           @RequestParam(defaultValue = "100000") Integer limit,
-                           @RequestParam(defaultValue = "0") Integer read_num,
-                           @RequestParam(defaultValue = "0") Integer clean_cache,
-                           @RequestParam(defaultValue = "0") Integer page_num,// todo 页码参数的功能暂时没有实现
-                           HttpServletRequest request){
+                           @RequestParam(defaultValue = "100000") Integer limit
+                           //@RequestParam(defaultValue = "0") Integer read_num,
+                           //@RequestParam(defaultValue = "0") Integer clean_cache,
+                           //@RequestParam(defaultValue = "0") Integer page_num,// todo 页码参数的功能暂时没有实现
+                           //HttpServletRequest request
+    ){
         long start_time = System.currentTimeMillis();
         condition = Utils.replaceBlank(condition);
-        logger.debug("parames,user:{},pwd:{},condition:{},collectionName:{},limit:{},read_num:{},page_num:{}",user,pwd,condition,collectionName,limit,read_num,page_num);
+        logger.debug("parames,user:{},pwd:{},condition:{},collectionName:{},limit:{}",user,pwd,condition,collectionName,limit);
         //返回信息实体
         ResponseStatement statement=new ResponseStatement();
         //step0 请求参数验证
@@ -119,6 +120,14 @@ public class Gts2Controller {
                         initConfigCondition(query,configs.getCondition());
                     }
                     //step4 正式查询
+                    query.limit(limit);
+                    logger.debug("query,{}",query.toString());
+                    List<Gts2> obj = mongoTemplate.find(query, Gts2.class,collectionName);
+                    statement.setData(obj);
+                    //statement.setAll_num(obj.size());
+                    //statement.setPage_num(1); //这里没有做分页，所以默认1
+                    int count = obj.size();
+                    /*
                     List<Gts2> obj = null;
                     int count = 0; //记录每次获取的总记录数
                     if(read_num.intValue() == 0){ //这里如果没有参数就走原来的方式
@@ -186,6 +195,7 @@ public class Gts2Controller {
                             }
                         }
                     }
+                    */
                     statement.setStatus("OK");
                     //statement.setData(obj);
                     logger.info("{},{},{},{}",System.currentTimeMillis()-start_time,count,user,collectionName);
