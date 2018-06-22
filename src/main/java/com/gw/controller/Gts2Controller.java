@@ -122,6 +122,7 @@ public class Gts2Controller {
                         obj = mongoTemplate.find(query, Gts2.class,collectionName);
                         statement.setData(obj);
                         statement.setAll_num(obj.size());
+                        statement.setPage_num(1); //这里没有做分页，所以默认1
                         count = obj.size();
                     }else {
                         //获取session对象
@@ -174,6 +175,7 @@ public class Gts2Controller {
                             }else{ //如果没有数据那就返回，空数组结果
                                 statement.setData(obj);
                                 statement.setAll_num(obj.size());
+                                statement.setPage_num(1);//这里数据不足分页操作，因此默认是1页
                                 count = obj.size();
                             }
                         }
