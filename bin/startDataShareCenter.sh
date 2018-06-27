@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 cd `dirname $0`
 BIN_DIR=`pwd`
 cd ..
@@ -19,13 +19,13 @@ start() {
  else
     JAVA_MEM_OPTS=" -server -Xms2048m -Xmx4096m "
  fi
- nohup java -D$RUN_NAME $JAVA_OPTS $JAVA_MEM_OPTS -jar ../lib/data-share-center-1.0-SNAPSHOT.jar >/dev/null 2>&1 &
+ nohup java -D$RUN_NAME $JAVA_OPTS $JAVA_MEM_OPTS -jar ../lib/data-share-center-1.0.jar >/dev/null 2>&1 &
  echo "$RUN_NAME started success.`date`"
 }
 
 stop() {
   echo "Stopping $RUN_NAME ...`date`"
-  kill -9 `ps -ef|grep $RUN_NAME|grep -v grep|grep -v stop|awk '{print $2}'`
+  kill -9 `ps -ef|grep $RUN_NAME|grep java|grep -v grep|grep -v stop|awk '{print $2}'`
 }
 
 case "$1" in
