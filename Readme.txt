@@ -45,11 +45,12 @@ db.gts2_config.insert({user:'test8', pwd:'test8', collectionName:'gts2_t_clone_c
 4.1、首先，脚本具有可执行权限
 chmod +x /opt/data-share-center-1.0/bin/startDataShareCenter.sh
 4.12、然后将脚本存放的绝对路径+脚本全名追加到/etc/rc.d/rc.local文件最后
-/opt/data-share-center-1.0/bin/startDataShareCenter.sh restart #springboot服务
+/opt/data-share-center-1.0/bin/startDataShareCenter.sh restart #springboot
 4.13、在centos7中，/etc/rc.d/rc.local的权限被降低了，所以需要执行如下命令赋予其可执行权限
 chmod +x /etc/rc.d/rc.local
 
 4.2 设置监控
+#Detects whether the data-share-center program process exists and restarts if it does not
 */1 * * * * /opt/data-share-center-1.0/bin/dataShareCenterCheck.sh >> /opt/data-share-center-1.0/logs/check.log
 
 4.3 网络流量监控
