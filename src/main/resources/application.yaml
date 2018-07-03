@@ -15,7 +15,7 @@ logback:
 #公共配置
 spring:
   profiles:
-    active: uat
+    active: local
 #服务配置
 #server:
 #  context-path: /api
@@ -44,19 +44,24 @@ spring:
   data:
     mongodb:
       primary:
-        uri: localhost:27017
-        database: gts2_business_data
+        uri: mongodb://devuser:devuser518@localhost:27017/gts2_business_data?authSource=admin&authMechanism=SCRAM-SHA-1
       secondary:
-        uri: localhost:27017
-        database: permission_config
+        uri: mongodb://devuser:devuser518@localhost:27017/permission_config?authSource=admin&authMechanism=SCRAM-SHA-1
 ---
 spring:
   profiles: uat
   data:
     mongodb:
       primary:
-        uri: 192.168.35.44:47017
-        database: gts2_business_data
+        uri: mongodb://192.168.35.44:47017/gts2_business_data
       secondary:
-        uri: 192.168.35.44:47017
-        database: permission_config
+        uri: mongodb://192.168.35.44:47017/permission_config
+---
+spring:
+  profiles: prod
+  data:
+    mongodb:
+      primary:
+        uri: mongodb://devuser:devuser518@192.168.254.182:47017/gts2_business_data?authSource=admin&authMechanism=SCRAM-SHA-1
+      secondary:
+        uri: mongodb://devuser:devuser518@192.168.254.182:47017/permission_config?authSource=admin&authMechanism=SCRAM-SHA-1

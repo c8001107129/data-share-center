@@ -1,8 +1,6 @@
 package com.gw.config;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -40,14 +38,17 @@ public class SecondaryMongoTemplate {
 
     @Bean
     public MongoDbFactory secondaryFactory(MongoProperties mongoProperties) throws Exception {
-        ServerAddress serverAdress = new ServerAddress(mongoProperties.getUri());
+        return new SimpleMongoDbFactory(new MongoClientURI(mongoProperties.getUri()));
+        /*ServerAddress serverAdress = new ServerAddress(mongoProperties.getUri());
         //不存在用户名于密码的情况
         if(mongoProperties.getUsername()==null && mongoProperties.getPassword()==null){
-            return new SimpleMongoDbFactory(new MongoClient(serverAdress), mongoProperties.getDatabase());
+            return new SimpleMongoDbFactory(new MongoClientURI(mongoProperties.getUri()));
         }else{
-            List<MongoCredential> mongoCredentialList = new ArrayList<>();
-            mongoCredentialList.add(MongoCredential.createCredential(mongoProperties.getUsername(), mongoProperties.getDatabase(), mongoProperties.getPassword()));
-            return new SimpleMongoDbFactory(new MongoClient(serverAdress, mongoCredentialList),  mongoProperties.getDatabase());
-        }
+            //List<MongoCredential> mongoCredentialList = new ArrayList<>();
+            //mongoCredentialList.add(MongoCredential.createCredential(mongoProperties.getUsername(), mongoProperties.getDatabase(), mongoProperties.getPassword()));
+            //return new SimpleMongoDbFactory(new MongoClient(serverAdress, mongoCredentialList),  mongoProperties.getDatabase());
+            MongoCredential mongoCredential = MongoCredential.createCredential(mongoProperties.getUsername(), mongoProperties.getDatabase(), mongoProperties.getPassword());
+            return new SimpleMongoDbFactory(new MongoClient(serverAdress,mongoCredential,new MongoClientOptions.Builder().build()),  mongoProperties.getDatabase());
+        }*/
     }
 }
