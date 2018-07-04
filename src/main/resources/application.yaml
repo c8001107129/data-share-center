@@ -15,7 +15,7 @@ logback:
 #公共配置
 spring:
   profiles:
-    active: local
+    active: prod
 #服务配置
 #server:
 #  context-path: /api

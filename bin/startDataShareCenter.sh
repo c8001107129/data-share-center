@@ -19,7 +19,7 @@ start() {
  else
     JAVA_MEM_OPTS=" -server -Xms2048m -Xmx4096m "
  fi
- nohup java -D$RUN_NAME $JAVA_OPTS $JAVA_MEM_OPTS -jar ../lib/data-share-center-1.0.jar >/dev/null 2>&1 &
+ nohup java -D$RUN_NAME $JAVA_OPTS $JAVA_MEM_OPTS -jar ../lib/data-share-center-1.0.jar --spring.config.location=../config/application.yaml >/dev/null 2>&1 &
  echo "$RUN_NAME started success.`date`"
 }
 
